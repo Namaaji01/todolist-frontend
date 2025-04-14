@@ -1,10 +1,17 @@
 import { useState, useEffect } from "react";
 
 export default function Timer() {
-  const [seconds, setSeconds] = useState(1500);
+  const [seconds, setSeconds] = useState(() => {
+    // Get the stored timer value from localStorage (or default to 1500 seconds)
+    const savedTime = localStorage.getItem("timerSeconds");
+    return savedTime ? parseInt(savedTime, 10) : 1500;
+  });
   const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
+    // Store the current timer value in localStorage whenever seconds change
+    localStorage.setItem("timerSeconds", seconds);
+
     let interval;
     if (isRunning) {
       interval = setInterval(() => setSeconds((prev) => prev - 1), 1000);
@@ -18,6 +25,11 @@ export default function Timer() {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m}:${s < 10 ? "0" : ""}${s}`;
+  };
+
+  const handleReset = () => {
+    setSeconds(1500); // Reset to initial value
+    localStorage.setItem("timerSeconds", 1500); // Update localStorage
   };
 
   return (
@@ -36,7 +48,7 @@ export default function Timer() {
           Pause
         </button>
         <button
-          onClick={() => setSeconds(1500)}
+          onClick={handleReset}
           className="bg-red-600 text-white px-4 py-2 rounded">
           Reset
         </button>
